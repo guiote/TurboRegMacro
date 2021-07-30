@@ -19,5 +19,6 @@ The macro is designed to fit with the imaging naming protocol of the Metamorph s
  
 ## **Shift_correction macro**
  The macro  has to be used following the Shift_Calibration macro; it is suitable for images aquired with the spinning disk systems in single camera mode (two channel aquired sequentially)
- * it applyes the transformation matrice on a specific channel chosen  by the user 
+ * the macro asks the user to select the transformation matrice obtained from the Shift_calibration macro
+ * it applyes the transformation matrice on a specific channel chosen by the user 
  * all the images contained in a folder are batch processed
