@@ -4,7 +4,7 @@ It has been developped to corrcec shifts that occurs on our Spinning disk system
 The macro is designed to fit with the imaging naming protocol of the Metamorph software on our Nikon CSU-X1 and Leica CSU-W1 spinning disk system.
 
 
- **SHIFT CALIBRATION MACRO**
+## **Shift_calibration macro**
 
  The macro charaterizes the chromatic shift between two imaging channels aquired sequentially (single camera mode). Ideal image for the calibration is obtained with fluorescent beads (Usually Tetraspeck beads allows to record the same object with standard laser lines ). 
  
@@ -17,3 +17,7 @@ The macro is designed to fit with the imaging naming protocol of the Metamorph s
    The transformation matrice saved from the calibration can be batch apply to series of aquired images (single or zStacks) using the 
   shift_correction macro.
  
+## **Shift_correction macro**
+ The macro  has to be used following the Shift_Calibration macro; it is suitable for images aquired with the spinning disk systems in single camera mode (two channel aquired sequentially)
+ * it applyes the transformation matrice on a specific channel chosen  by the user 
+ * all the images contained in a folder are batch processed
