@@ -1,9 +1,10 @@
 # TurboRegMacros
 Macros to correct chromatic shift between acquisition channels
-It has been developped to corecet shift that occurs on our Pinning disk system.
+It has been developped to corrcec shifts that occurs on our Spinning disk systems.
 The macro is designed to fit with the imaging naming protocol of the Metamorph software on our Nikon CSU-X1 and Leica CSU-W1 spinning disk system.
 
-**SHIFT CALIBRATION MACRO**
+
+ **SHIFT CALIBRATION MACRO**
 
  The macro charaterizes the chromatic shift between two imaging channels aquired sequentially (single camera mode). Ideal image for the calibration is obtained with fluorescent beads (Usually Tetraspeck beads allows to record the same object with standard laser lines ). 
  
