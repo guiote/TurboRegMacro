@@ -33,7 +33,6 @@ if (transname.contains("RigidBody") == "true") TransToApply = "-rigidBody ";	// 
 if (transname.contains("Affine") == "true")  TransToApply = "-affine ";
 
 Table.rename("Transformation.csv");
-
 sourceX0 = getResult("sourceX", 0); // First line of the table.
 sourceY0 = getResult("sourceY", 0);
 targetX0 = getResult("targetX", 0);
@@ -79,9 +78,6 @@ listImages = newArray(list.length);
 ImagesToCorrect=newArray(list.length);
 
 setBatchMode(true);
-for (i=0; i<list.length; i++) {
-		print (list[i]);
-}
 
 j=0;
 
@@ -94,6 +90,7 @@ for (i=0; i<list.length; i++) {
 	}
 
 print("\\Clear");
+var IDimgResult;
 nbImagesToCorrect= j;
 for (i=0; i<nbImagesToCorrect; i++) {
 
@@ -105,9 +102,39 @@ for (i=0; i<nbImagesToCorrect; i++) {
 		height = getHeight();
 		numSlices = nSlices;
 		print("Correcting " + ImagesToCorrect[i] );
+
 		
+TurboRegTransform (imgName, numSlices, width, height, TransToApply, 
+				sourceX0 , sourceY0 ,targetX0, targetY0 ,sourceX1, sourceY1, targetX1, targetY1, sourceX2, sourceY2, targetX2, targetY2);			// Apply the transformation
+
+ 		selectWindow("registered");
+ 		corrImage=dir + "registered_" + originalName  ;
+		 save(corrImage);
+		 close();
+		 /*selectWindow("Output");
+		 close();
+		 selectWindow(imgName);
+		 close();*/
+		 while (nImages>0) { 
+          selectImage(nImages); 
+          close(); 
+		}
+}
+setBatchMode(false);
+print ("Done!");
+
+/*-----------------------------------------------------------------------------------------------------------------------------------------------*/
+/*                                                  Fonctions                                                                                    */
+/*-----------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+function TurboRegTransform (imgName, numSlices, width, height, TransToApply, 
+			sourceX0 , sourceY0 ,targetX0, targetY0 ,sourceX1, sourceY1, targetX1, 
+			targetY1, sourceX2, sourceY2,	targetX2, targetY2 ){
+	
 if (numSlices == 1){		
 
+	selectImage(imgName);
 	run("TurboReg ", "-transform " 					//run turboReg transform							
 		+ "-window " + imgName + " " 
 		+ width + " " + height + " "
@@ -122,14 +149,8 @@ if (numSlices == 1){
 									
 		run("Conversions...", " "); //don't re-scale when converting to 16bit
 		run("16-bit");
-		 run("Duplicate...", "title=registered"); //get the result
-		 corrImage=dir + "registered_" + originalName  ;
-		 save(corrImage);
-		 close();
-		 selectWindow("Output");
-		 close();
-		 selectWindow(imgName);
-		 close();
+		run("Duplicate...", "title=registered"); //get the result
+		//IDimgResult = getImageID();
 }else {
 		
 	for(j=1; j <=numSlices; j++) { //for each slice				//if the image is a zstack
@@ -164,17 +185,12 @@ if (numSlices == 1){
 		    selectWindow("Output");
 		    close();
 	}
-				selectWindow("registeredStack");
-		     corrImage=dir + "registered_"  + originalName  ;
-			 save(corrImage);
-			 close();
+			selectWindow("registeredStack");
+			rename("registered");
+		    //IDimgResult = getImageID();
 		}
  }	
-setBatchMode(false);
-print ("Done!");
-while (nImages>0) { 
-          selectImage(nImages); 
-          close(); 
+
 
 /*
  *  run("TurboReg ",
