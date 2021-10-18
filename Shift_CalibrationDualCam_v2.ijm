@@ -1,4 +1,4 @@
-/* Macro Written by Elvire GUIOT - Imaging Center if IGBMC - July 2021
+/* Macro Written by Elvire GUIOT - Imaging Center if IGBMC - Oct 2021
  *  guiote@igbmc.fr
  * The macro  charaterizes the chromatic shift between two imaging channels on the base of fluorescent beads images (Usually
  * Tetraspeck beads allows to record the same object with standard laser lines )
@@ -15,6 +15,8 @@
 
 
 var dirPath;
+var width;
+var height;
 
 	roiManager("reset");
 	selectWindow("ROI Manager");
@@ -28,56 +30,36 @@ var dirPath;
 	selectWindow("Log");
 	run("Close");
 
-	 /* Selection of the target image for calibration - traget is the reference to which the source will be aligned*/
+	
  	items = newArray("Rigid Body", "Affine");				//choice between RigigBody or Affine type of distortion.
- 	fluo = newArray("DAPI", "Green", "Red", "FarRed");
-	defaults = newArray(false, false, false, false);
-	Dialog.create("Calib Image selection");
-	Dialog.addMessage("Which fuorescence Channel is the Target (reference )image?");					/* select the target reference*/
-/*	Dialog.addMessage("(The target  determines the reference to which the source image will be aligned)");*/
-	Dialog.addCheckboxGroup(1, 4, fluo, defaults);
+ 	Dialog.create("Calib Image selection");
 	Dialog.addChoice("Transformation", items);
-	Dialog.addMessage(" ");
-	Dialog.addMessage("Now Select the Target image file for calibration -->");		
+	Dialog.addMessage("Please Select the DualCam image file for calibration -->");		
 	Dialog.show();
-	for (i=0; i<4; i++){
-    		defaults[i] = Dialog.getCheckbox();
-    		if (defaults[i] == true) TargetChannel = fluo[i];
-	}
+
 	transformation= Dialog.getChoice();
 
-//print ("TargetChannel = "+ TargetChannel);
-//print("Transformation = " + transformation);
 		
 	open();										
 	dirPath = File.directory;							/*r�cup�ration du "path"*/
 	getDimensions(width, height, channels, slices, frames);
-	IDTarget = getImageID();
-	run("Duplicate...", "title=image_target");
+	IDrawImage = getImageID();
+	makeRectangle(0,0, width/2, height);
+	run("Duplicate...", "title=ImageTarget");				/* taregt is the reference image - left image*/
 	setAutoThreshold("Otsu dark");
 	run("Convert to Mask");
 	imgName_target=getTitle();
-
-	defaults = newArray(false, false, false, false);
-	 /* Selection of the source image for calibration */
-	Dialog.create("Calib Image selection");
-	Dialog.addMessage("Which fuorescence Channel is the Source (Image to be aligned)image?");	
-	Dialog.addCheckboxGroup(1, 4, fluo, defaults);
-	Dialog.addMessage(" ");
-	Dialog.addMessage("Now, Select the Source image for calibration -->");					/* select the source*/
-	Dialog.show();
-	for (i=0; i<4; i++){
-    		defaults[i] = Dialog.getCheckbox();
-    		if (defaults[i] == true) SourceChannel = fluo[i];
-	}
-	open();		
-	IDSource = getImageID();
-	run("Duplicate...", "title=image_source");
+	selectImage(IDrawImage);
+	makeRectangle(width/2,0, width, height);
+	run("Duplicate...", "title=ImageSource");				/* source is the image tobe aligned  - right image*/
 	setAutoThreshold("Otsu dark");
 	run("Convert to Mask");
 	imgName_source=getTitle();
 	width = getWidth();
 	height = getHeight();												// size of the image is needed for the turboReg function
+	
+	selectImage(IDrawImage);
+	close();
 	
 if (transformation == "Rigid Body" ){
 TurboReg_RigidBody(imgName_source, imgName_target, width, height);
@@ -104,7 +86,7 @@ targetX2 = getResult("targetX", 2);
 targetY2 = getResult("targetY", 2);
 
 selectWindow("Refined Landmarks");
-ResultPath= dirPath + "Transformation_RigidBody_" + TargetChannel + "_" + SourceChannel +" .csv";
+ResultPath= dirPath + "Transformation_RigidBody_dualCam.csv";
 saveAs("Results", ResultPath);
 run("Close");
 while (nImages>0) { 
@@ -115,7 +97,7 @@ while (nImages>0) {
 
 if (transformation == "Affine" ){
 TurboReg_Affine(imgName_source, imgName_target, width, height);
-
+ 
 // 3) The numeric results are stored inside ImageJ's results table. The first
 // line (index [0]) corresponds to the coordinates of the pair of landmarks that
 // determine the translation component. This translation might be non-zero
@@ -138,7 +120,7 @@ targetX2 = getResult("targetX", 2);
 targetY2 = getResult("targetY", 2);
 
 selectWindow("Refined Landmarks");
-ResultPath= dirPath + "Transformation_Affine_" + TargetChannel + "_" + SourceChannel +".csv";
+ResultPath= dirPath + "Transformation_Affine_dualCam.csv";
 saveAs("Results", ResultPath);
 run("Close");
 while (nImages>0) { 
@@ -196,7 +178,7 @@ sourceY0 = round(height*0.1);
 targetX0 = sourceX0;
 targetY0 = sourceY0;
 sourceX1 = round(width/4);
-sourceY1 = round(height*0.9);
+sourceY1 = round(height*0.8);
 targetX1 = sourceX1;
 targetY1 = sourceY1;
 sourceX2 = round(width*0.8);
